@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">UpdateAttendance</string>
+    <string name="select_date">Select a Date</string>
+    <string name="update_attendance">Update Attendance</string>
+    <string name="calculate_attendance">Calculate Attendance</string>
+    <string name="fetch_attendance">Fetch Attendance</string>
+</resources>
