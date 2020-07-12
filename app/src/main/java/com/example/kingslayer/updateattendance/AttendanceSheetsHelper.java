@@ -36,7 +36,7 @@ import java.util.List;
 public class AttendanceSheetsHelper {
     private String SPREADSHEET_ID = "1BjgpYrXGM28vy_L2Et2dhQvCpq98ezzGXXRoXBuBc0c";
     private Sheets sheets = null;
-    private int mColumnCount;
+//    private int mColumnCount;
     AttendanceSheetsHelper(Sheets sheets)
     {
         this.sheets = sheets;
@@ -46,12 +46,7 @@ public class AttendanceSheetsHelper {
     {
 
         int mLastColumn = getLastColumn();
-
-        if(mLastColumn <= mColumnCount)
-        {
-            addColumn();
-        }
-
+        addColumn();
         UpdateCellsRequest updateCellsRequest = new UpdateCellsRequest();
         GridRange gridRange = new GridRange().setSheetId(0).setStartColumnIndex(mLastColumn)
                 .setEndColumnIndex(mLastColumn + 1)
@@ -81,29 +76,24 @@ public class AttendanceSheetsHelper {
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 
         BatchUpdateSpreadsheetResponse response = sheets.spreadsheets().batchUpdate(SPREADSHEET_ID, batchUpdateSpreadsheetRequest).execute();
-        mColumnCount = response.getUpdatedSpreadsheet().getSheets().get(0).getProperties().getGridProperties().getColumnCount();
+//        mColumnCount = response.getUpdatedSpreadsheet().getSheets().get(0).getProperties().getGridProperties().getColumnCount();
     }
 
-    private JSONObject getData() throws Exception
-    {
-        try {
+    private int getLastColumn() throws Exception {
+       try {
             OkHttpClient client = new OkHttpClient();
             com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
                     .url("https://script.google.com/macros/s/AKfycbwYb2ea4BjvN_XfnGUJyU7CvnXc_T2pYJdN7KmNvN5MVNBGeOc4/exec")
                     .build();
             Response response = client.newCall(request).execute();
-            return new JSONObject(response.body().string());
-
-
-        } catch (@NonNull IOException e) {
+            String json = response.body().string();
+            int start = json.indexOf(':') + 1;
+            int end = json.indexOf('}');
+           return Integer.parseInt(json.substring(start, end));
+        } catch (Exception e) {
             Log.e("GetData:", "recieving null " + e.getLocalizedMessage());
+            throw e;
         }
-        return null;
-    }
-
-    private int getLastColumn() throws Exception {
-       JSONObject jsonObject = getData();
-       return jsonObject.getInt("column");
     }
 
     public List<Double> fetchAttendanceOnDate(String mDate) throws Exception
@@ -166,21 +156,26 @@ public class AttendanceSheetsHelper {
     }
 
     public String updateFormula(String formula) throws Exception {
-        int mLastColumn = getLastColumn();
-        if(mLastColumn <= mColumnCount)
-        {
+        try {
+            int mLastColumn = getLastColumn();
             addColumn();
-        }
-        RepeatCellRequest repeatCellRequest = new RepeatCellRequest();
-        repeatCellRequest.setCell(new CellData().setEffectiveValue(
-                    new ExtendedValue().setFormulaValue(formula)))
-                    .setFields("userEnteredValue")
-                    .setRange(new GridRange().setSheetId(0).setStartColumnIndex(mLastColumn)
+            Log.d("LastColumn", "" + mLastColumn);
+            RepeatCellRequest repeatCellRequest = new RepeatCellRequest();
+            repeatCellRequest.setCell(new CellData().setUserEnteredValue(new ExtendedValue().setFormulaValue("=" + formula)))
+                    .setFields("*")
+                    .setRange(
+                        new GridRange().setSheetId(0)
+                            .setStartColumnIndex(mLastColumn)
                             .setEndColumnIndex(mLastColumn + 1)
-                            .setStartRowIndex(1).setEndRowIndex(58));
-        List<Request> requestList = new ArrayList<>();
-        requestList.add(new Request().setRepeatCell(repeatCellRequest));
-        executeRequest(requestList);
-        return "Success";
+                            .setStartRowIndex(1)
+                            .setEndRowIndex(59)
+                    );
+            List<Request> requestList = new ArrayList<>();
+            requestList.add(new Request().setRepeatCell(repeatCellRequest));
+            executeRequest(requestList);
+            return "Success";
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
