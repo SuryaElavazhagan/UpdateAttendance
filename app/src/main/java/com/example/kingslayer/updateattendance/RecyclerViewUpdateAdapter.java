@@ -43,7 +43,6 @@ public class RecyclerViewUpdateAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Students students = mStudentsList.get(position);
-
         try {
             holder.mName.setText(students.getRollNo() + " : " + students.getStudentName());
             holder.mResult.setText(" " + students.getPeriods() + " ");
