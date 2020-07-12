@@ -183,7 +183,14 @@ public class UpdateAttendanceActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        progressDialog.dismiss();
         realm.close();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        progressDialog.dismiss();
     }
 
     @Override
