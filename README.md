@@ -8,3 +8,7 @@ Also, I wanted to get the following,
 - Weekly attendance percentage stats
 
 So, this app also gets a formula to calculate the given formula.
+
+### Demo
+Please check the demo [here](https://suryaelavazhagan.github.io/UpdateAttendance/index.html)
+> Note: Video is fast forwarded (x4)
