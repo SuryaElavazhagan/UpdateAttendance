@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleAccountCredential mCredential;
     private Button updateAttendance;
     private Button fetchAttendance;
+    private Button computeAttendance;
     private Intent mIntent;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -69,6 +70,14 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        computeAttendance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mIntent = new Intent(MainActivity.this, ComputeAttendanceActivity.class);
+                startActivity(mIntent);
+            }
+        });
+
         updateAttendance.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -94,6 +103,7 @@ public class MainActivity extends AppCompatActivity
         mSelectDate = findViewById(R.id.select_date_tv);
         updateAttendance = findViewById(R.id.update_attendance);
         fetchAttendance = findViewById(R.id.fetch_attendance);
+        computeAttendance = findViewById(R.id.calculate_attendance);
 
         updateAttendance.setEnabled(false);
         fetchAttendance.setEnabled(false);

@@ -34,7 +34,7 @@ import java.util.Arrays;
 import static com.example.kingslayer.updateattendance.MainActivity.REQUEST_AUTHORIZATION;
 import static com.example.kingslayer.updateattendance.MainActivity.REQUEST_GOOGLE_PLAY_SERVICES;
 
-public class ComputeAttendanceActivity extends AppCompatActivity {
+public class  ComputeAttendanceActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
     String mFormula = null;
@@ -47,6 +47,7 @@ public class ComputeAttendanceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compute_attendance);
+        progressDialog = new ProgressDialog(this);
 
         progressDialog.setMessage("Please Wait....");
 
@@ -136,11 +137,19 @@ public class ComputeAttendanceActivity extends AppCompatActivity {
                     .Builder(httpTransport,jsonFactory,googleAccountCredential)
                     .setApplicationName("Update Attendance").build();
 
-            sheetsHelper =new AttendanceSheetsHelper(sheets);
+            sheetsHelper = new AttendanceSheetsHelper(sheets);
+            this.context = context;
         }
         @Override
         protected void onPostExecute(String s) {
-            Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+            Toast.makeText(context, "Your formula is applied to a new column", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.show();
         }
 
         @Override
@@ -165,10 +174,10 @@ public class ComputeAttendanceActivity extends AppCompatActivity {
                             ((GooglePlayServicesAvailabilityIOException) mError)
                                     .getConnectionStatusCode());
                 } else if (mError instanceof UserRecoverableAuthIOException) {
-
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mError).getIntent(),
-                            REQUEST_AUTHORIZATION);
+                            REQUEST_AUTHORIZATION
+                    );
                 } else {
                     Toast.makeText(context, mError.getMessage(), Toast.LENGTH_LONG).show();
                 }
